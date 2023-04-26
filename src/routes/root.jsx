@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Outlet, Link, useLoaderData, Form, redirect, NavLink, useNavigation } from 'react-router-dom'
 import { getContacts, createContact } from '../contacts'
 
@@ -6,24 +7,34 @@ export async function action() {
 	return redirect(`/contacts/${contact.id}/edit`)
 }
 
-export async function loader() {
-	const contacts = await getContacts()
-	return { contacts }
+export async function loader({ request }) {
+	const url = new URL(request.url)
+	const q = url.searchParams.get('q')
+	const contacts = await getContacts(q)
+	return { contacts, q }
 }
 
 export default function Root() {
-	const { contacts } = useLoaderData()
+	const { contacts, q } = useLoaderData()
 	const navigation = useNavigation()
+
+	useEffect(() => {
+		document.getElementById('q').value = q
+	}, [q]) //updating search input after using comeback button
+
 	return (
 		<>
 			<div id='sidebar'>
 				<h1>React Router Contacts</h1>
 				<div>
-					<form id='search-form' role='search'>
-						<input id='q' aria-label='Search contacts' placeholder='Search' type='search' name='q' />
+					{/* it does not have <form method="post">. The default method is "get" 
+					Because this is a GET, not a POST, React Router does not call the action*/}
+					<Form id='search-form' role='search'>
+						<input id='q' aria-label='Search contacts' placeholder='Search' type='search' name='q' defaultValue={q} />
+						{/* name of this input is q, that's why the URL has ?q=. */}
 						<div id='search-spinner' aria-hidden hidden={true} />
 						<div className='sr-only' aria-live='polite'></div>
-					</form>
+					</Form>
 					<Form method='post'>
 						<button type='submit'>New</button>
 					</Form>
