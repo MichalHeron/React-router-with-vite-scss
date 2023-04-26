@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Outlet, Link, useLoaderData, Form, redirect, NavLink, useNavigation } from 'react-router-dom'
+import { Outlet, Link, useLoaderData, Form, redirect, NavLink, useNavigation, useSubmit } from 'react-router-dom'
 import { getContacts, createContact } from '../contacts'
 
 export async function action() {
@@ -17,6 +17,7 @@ export async function loader({ request }) {
 export default function Root() {
 	const { contacts, q } = useLoaderData()
 	const navigation = useNavigation()
+	const submit = useSubmit()
 
 	useEffect(() => {
 		document.getElementById('q').value = q
@@ -30,7 +31,17 @@ export default function Root() {
 					{/* it does not have <form method="post">. The default method is "get" 
 					Because this is a GET, not a POST, React Router does not call the action*/}
 					<Form id='search-form' role='search'>
-						<input id='q' aria-label='Search contacts' placeholder='Search' type='search' name='q' defaultValue={q} />
+						<input
+							id='q'
+							aria-label='Search contacts'
+							placeholder='Search'
+							type='search'
+							name='q'
+							defaultValue={q}
+							onChange={event => {
+								submit(event.currentTarget.form) // dziala tylko miedzyinnymi na form submituje zmiany input
+							}}
+						/>
 						{/* name of this input is q, that's why the URL has ?q=. */}
 						<div id='search-spinner' aria-hidden hidden={true} />
 						<div className='sr-only' aria-live='polite'></div>
