@@ -42,7 +42,8 @@ export default function Root() {
 							name='q'
 							defaultValue={q}
 							onChange={event => {
-								submit(event.currentTarget.form) // dziala tylko miedzyinnymi na form submituje zmiany input
+								const isFirstSearch = q == null
+								submit(event.currentTarget.form, { replace: !isFirstSearch }) // dziala tylko miedzyinnymi na form submituje zmiany input | dodanie replace ma usunac problem z historia wyszukiwania (kazdy wpisany znak osobno zamiast calego wyszukiwania, ale dzialalo tak przez ta zmiana (?))
 							}}
 						/>
 						{/* name of this input is q, that's why the URL has ?q=. */}
